@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rozana Ka Hisab - Expense Tracker</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --primary: #1a237e;
+            --secondary: #283593;
+            --accent: #3949ab;
+            --success: #2e7d32;
+            --light-bg: #f8f9fa;
+            --border: #e0e0e0;
+            --text: #333333;
+        }
+
+        body {
+            background-color: #f5f7fb;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .app-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo {
+            width: 45px;
+            height: 45px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 5px;
+        }
+
+        .logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .app-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .app-subtitle {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        .user-info-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .user-info-card::before {
+            content: "";
+            position: absolute;
+            top: -50%;
+            right: -50%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(30deg);
+        }
+
+        .user-info-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .user-avatar {
+            width: 60px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 15px;
+            font-size: 1.5rem;
+        }
+
+        .user-details {
+            flex-grow: 1;
+        }
+
+        .user-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .user-phone {
+            font-size: 0.95rem;
+            opacity: 0.9;
+        }
+
+        .user-edit-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            border-radius: 6px;
+            padding: 8px 15px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .user-edit-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .user-info-form {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+
+        .user-info-form .form-label {
+            color: white;
+            font-weight: 500;
+        }
+
+        .user-info-form .form-control {
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .bank-statement-style {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .statement-header {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 20px;
+        }
+
+        .statement-body {
+            padding: 20px;
+        }
+
+        .transaction-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        .transaction-table th {
+            background-color: #f0f2f5;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid var(--border);
+            color: var(--primary);
+        }
+
+        .transaction-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .transaction-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .transaction-table tr:hover {
+            background-color: #f9fafb;
+        }
+
+        .amount {
+            font-weight: 600;
+            text-align: right;
+        }
+
+        .expense {
+            color: #d32f2f;
+        }
+
+        .total-row {
+            background-color: #f0f2f5;
+            font-weight: 700;
+        }
+
+        .total-row td {
+            border-top: 2px solid var(--border);
+            padding-top: 15px;
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .section-title i {
+            font-size: 1.2rem;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            border: none;
+            padding: 12px 20px;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-outline-primary {
+            border-color: var(--primary);
+            color: var(--primary);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-success {
+            background: var(--success);
+            border: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-success:hover {
+            background: #1b5e20;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-left: 4px solid var(--accent);
+            margin-bottom: 15px;
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .summary-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .summary-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .summary-label {
+            font-size: 0.9rem;
+            color: #666;
+            font-weight: 500;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+
+        .empty-state i {
+            font-size: 3.5rem;
+            color: #ccc;
+            margin-bottom: 15px;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .floating-action-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 60px;
+            height: 60px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 99;
+            transition: all 0.3s;
+        }
+
+        .floating-action-btn:hover {
+            background: var(--secondary);
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .month-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .month-nav-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+
+        .month-nav-btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .month-display {
+            font-weight: 600;
+            color: var(--primary);
+            min-width: 150px;
+            text-align: center;
+        }
+        .simple-footer {
+    background: #f8f9fa;
+    border-top: 1px solid #e9ecef;
+}
+
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            .bank-statement-style,
+            .bank-statement-style * {
+                visibility: visible;
+            }
+
+            .bank-statement-style {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                box-shadow: none;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-header {
+                padding: 12px 0;
+            }
+
+            .app-title {
+                font-size: 1.2rem;
+            }
+
+            .app-subtitle {
+                font-size: 0.8rem;
+            }
+
+            .logo {
+                width: 40px;
+                height: 40px;
+            }
+
+            .user-info-card {
+                padding: 15px;
+            }
+
+            .user-avatar {
+                width: 50px;
+                height: 50px;
+                font-size: 1.3rem;
+            }
+
+            .user-name {
+                font-size: 1.1rem;
+            }
+
+            .form-section,
+            .statement-body {
+                padding: 15px;
+            }
+
+            .transaction-table {
+                font-size: 0.85rem;
+            }
+
+            .transaction-table th,
+            .transaction-table td {
+                padding: 8px 10px;
+            }
+
+            .btn {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+
+            .summary-card {
+                padding: 15px;
+            }
+
+            .summary-value {
+                font-size: 1.5rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-buttons .btn {
+                width: 100%;
+            }
+
+            .floating-action-btn {
+                width: 50px;
+                height: 50px;
+                bottom: 15px;
+                right: 15px;
+            }
+
+            .month-selector {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .month-display {
+                min-width: auto;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .transaction-table {
+                display: block;
+                overflow-x: auto;
+            }
+
+            .section-title {
+                font-size: 1.1rem;
+            }
+
+            .form-section .row {
+                margin-bottom: 10px;
+            }
+
+            .form-section .col-md-2,
+            .form-section .col-md-4 {
+                margin-bottom: 15px;
+            }
+
+            .logo-container {
+                gap: 10px;
+            }
+
+            .app-title {
+                font-size: 1.1rem;
+            }
+
+            .user-info-header {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .user-avatar {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Main App -->
+    <div class="app-header">
+        <div class="container">
+            <div class="logo-container">
+                <div class="logo">
+                    <img src="logo.png" alt="Rozana Ka Hisab Logo"
+                        onerror="this.style.display='none'; this.parentNode.innerHTML='<i class=&quot;fas fa-calculator&quot;></i>';">
+                </div>
+                <div>
+                    <h1 class="app-title">Rozana Ka Hisab</h1>
+                    <p class="app-subtitle">Daily Expense Tracker</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container py-4">
+        <!-- User Info and Summary -->
+        <div class="row mb-4 no-print">
+            <div class="col-md-6">
+                <div class="user-info-card">
+                    <div class="user-info-header">
+                        <div class="user-avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="user-details">
+                            <div class="user-name" id="displayUserName">Ameet Kumar Dhera</div>
+                            <div class="user-phone" id="displayUserPhone">03161103616</div>
+                        </div>
+                        <button class="user-edit-btn" id="toggleUserForm">
+                            <i class="fas fa-edit me-1"></i> Edit
+                        </button>
+                    </div>
+
+                    <div class="user-info-form" id="userForm" style="display: none;">
+                        <div class="row g-2">
+                            <div class="col-md-6">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" class="form-control" id="userName" value="Ameet Kumar Dhera">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone Number</label>
+                                <input type="text" class="form-control" id="userPhone" value="03161103616">
+                            </div>
+                            <div class="col-12 mt-2">
+                                <button type="button" class="btn btn-sm btn-light me-2" id="saveUserInfo">
+                                    <i class="fas fa-save me-1"></i> Save
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-light" id="cancelUserEdit">
+                                    Cancel
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-section">
+                    <h5 class="section-title"><i class="fas fa-chart-pie"></i> Monthly Summary</h5>
+                    <div class="row">
+                        <div class="col-6">
+                            <div class="summary-card">
+                                <div class="summary-value" id="monthTotal">₹0.00</div>
+                                <div class="summary-label">Total Expenses</div>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="summary-card">
+                                <div class="summary-value" id="transactionCount">0</div>
+                                <div class="summary-label">Transactions</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add Expense Form -->
+        <div class="form-section no-print">
+            <h5 class="section-title"><i class="fas fa-plus-circle"></i> Add New Expense</h5>
+            <form id="expenseForm" class="row g-3">
+                <div class="col-md-2">
+                    <label class="form-label">Date</label>
+                    <input type="date" class="form-control" id="expenseDate" required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Amount (₹)</label>
+                    <input type="number" step="0.01" class="form-control" id="expenseAmount" placeholder="0.00"
+                        required>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label">Category</label>
+                    <select class="form-select" id="expenseCategory">
+                        <option value="Food & Dining">Food & Dining</option>
+                        <option value="Shopping">Shopping</option>
+                        <option value="Transportation">Transportation</option>
+                        <option value="Bills & Utilities">Bills & Utilities</option>
+                        <option value="Entertainment">Entertainment</option>
+                        <option value="Personal Care">Personal Care</option>
+                        <option value="Health & Medical">Health & Medical</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">Description</label>
+                    <input type="text" class="form-control" id="expenseDescription"
+                        placeholder="Enter transaction details">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="fas fa-plus me-1"></i> Add
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Month Filter and Actions -->
+        <div class="d-flex justify-content-between align-items-center mb-3 no-print">
+            <h5 class="section-title mb-0"><i class="fas fa-history"></i> Expense History</h5>
+            <div class="d-flex gap-2 flex-wrap align-items-center">
+                <div class="month-selector">
+                    <button class="month-nav-btn" id="prevMonthBtn">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <div class="month-display" id="currentMonthDisplay">November 2023</div>
+                    <button class="month-nav-btn" id="nextMonthBtn">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+                <div class="action-buttons">
+                    <button id="pdfBtn" class="btn btn-success">
+                        <i class="fas fa-file-pdf me-1"></i> PDF
+                    </button>
+                    <button id="printBtn" class="btn btn-outline-primary">
+                        <i class="fas fa-print me-1"></i> Print
+                    </button>
+                    <button id="clearAllBtn" class="btn btn-outline-danger">
+                        <i class="fas fa-trash me-1"></i> Clear
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bank Statement Style Display -->
+        <div class="bank-statement-style">
+            <div class="statement-header">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h2 class="h4 mb-1">Rozana Ka Hisab Report</h2>
+                        <p class="mb-0" id="reportPeriod">Monthly Expense Statement</p>
+                    </div>
+                    <div class="col-md-6 text-md-end">
+                        <p class="mb-1" id="reportUserName">Name: Ameet Kumar Dhera</p>
+                        <p class="mb-0" id="reportUserPhone">Phone: 03161103616</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="statement-body">
+                <table class="transaction-table">
+                    <thead>
+                        <tr>
+                            <th width="15%">Date</th>
+                            <th width="25%">Description</th>
+                            <th width="15%">Category</th>
+                            <th width="15%" class="text-end">Amount (₹)</th>
+                            <th width="10%" class="no-print">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="transactionsBody">
+                        <!-- Transactions will be inserted here -->
+                    </tbody>
+                    <tfoot>
+                        <tr class="total-row">
+                            <td colspan="3" class="text-end"><strong>Total Expenses:</strong></td>
+                            <td class="text-end" id="tableTotal">₹0.00</td>
+                            <td class="no-print"></td>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <div id="emptyState" class="empty-state">
+                    <i class="fas fa-receipt"></i>
+                    <h5>No transactions found for this month</h5>
+                    <p>Add expenses using the form above or select a different month</p>
+                </div>
+            </div>
+        </div>
+<div class="simple-footer no-print mt-4 py-3">
+    <div class="container">
+        <div class="text-center">
+            <small class="text-muted">
+                <i class="fas fa-calculator me-1"></i>
+                Rozana Ka Hisab • 
+                <i class="fas fa-user me-1 ms-2"></i>
+                Created by <strong>Ameet Kumar Dhera</strong> • 
+                <i class="fas fa-phone me-1 ms-2"></i>
+                03161103616
+            </small>
+        </div>
+    </div>
+</div>
+    </div>
+
+    <!-- Floating Action Button for Mobile -->
+    <div class="floating-action-btn no-print" id="fab">
+        <i class="fas fa-plus"></i>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Data keys for localStorage
+        const EXPENSES_KEY = 'bank_style_expenses';
+        const USER_INFO_KEY = 'bank_style_user_info';
+
+        // Initialize data
+        let expenses = JSON.parse(localStorage.getItem(EXPENSES_KEY)) || [];
+        let userInfo = JSON.parse(localStorage.getItem(USER_INFO_KEY)) || {
+            name: "Ameet Kumar Dhera",
+            phone: "03161103616"
+        };
+
+        // Current selected month for filtering
+        let currentFilterMonth = null;
+
+        // DOM elements
+        const expenseForm = document.getElementById('expenseForm');
+        const transactionsBody = document.getElementById('transactionsBody');
+        const emptyState = document.getElementById('emptyState');
+        const tableTotal = document.getElementById('tableTotal');
+        const monthTotal = document.getElementById('monthTotal');
+        const transactionCount = document.getElementById('transactionCount');
+        const reportUserName = document.getElementById('reportUserName');
+        const reportUserPhone = document.getElementById('reportUserPhone');
+        const reportPeriod = document.getElementById('reportPeriod');
+        const displayUserName = document.getElementById('displayUserName');
+        const displayUserPhone = document.getElementById('displayUserPhone');
+        const userNameInput = document.getElementById('userName');
+        const userPhoneInput = document.getElementById('userPhone');
+        const userForm = document.getElementById('userForm');
+        const toggleUserFormBtn = document.getElementById('toggleUserForm');
+        const saveUserInfoBtn = document.getElementById('saveUserInfo');
+        const cancelUserEditBtn = document.getElementById('cancelUserEdit');
+        const fab = document.getElementById('fab');
+        const prevMonthBtn = document.getElementById('prevMonthBtn');
+        const nextMonthBtn = document.getElementById('nextMonthBtn');
+        const currentMonthDisplay = document.getElementById('currentMonthDisplay');
+
+        // Set current date as default
+        const today = new Date();
+        expenseForm.expenseDate.value = today.toISOString().slice(0, 10);
+
+        // Initialize the app
+        initApp();
+
+        function initApp() {
+            updateUserInfo();
+            setupEventListeners();
+
+            // Set initial month to current month or first available month with data
+            if (expenses.length > 0) {
+                // Find the earliest month with data
+                const earliestDate = new Date(Math.min(...expenses.map(e => new Date(e.date))));
+                currentFilterMonth = new Date(earliestDate.getFullYear(), earliestDate.getMonth(), 1);
+            } else {
+                currentFilterMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+            }
+
+            updateMonthDisplay();
+            renderTransactions();
+        }
+
+        function updateUserInfo() {
+            displayUserName.textContent = userInfo.name;
+            displayUserPhone.textContent = userInfo.phone;
+            userNameInput.value = userInfo.name;
+            userPhoneInput.value = userInfo.phone;
+            reportUserName.textContent = `Name: ${userInfo.name}`;
+            reportUserPhone.textContent = `Phone: ${userInfo.phone}`;
+        }
+
+        function setupEventListeners() {
+            // User info form toggle
+            toggleUserFormBtn.addEventListener('click', function () {
+                userForm.style.display = userForm.style.display === 'none' ? 'block' : 'none';
+            });
+
+            // Save user info
+            saveUserInfoBtn.addEventListener('click', saveUserInfo);
+
+            // Cancel user info edit
+            cancelUserEditBtn.addEventListener('click', function () {
+                userForm.style.display = 'none';
+                updateUserInfo(); // Reset form to current values
+            });
+
+            // Form submission
+            expenseForm.addEventListener('submit', addExpense);
+
+            // Month navigation
+            prevMonthBtn.addEventListener('click', navigateToPrevMonth);
+            nextMonthBtn.addEventListener('click', navigateToNextMonth);
+
+            // Clear all button
+            document.getElementById('clearAllBtn').addEventListener('click', clearAllExpenses);
+
+            // Print button
+            document.getElementById('printBtn').addEventListener('click', () => window.print());
+
+            // PDF button
+            document.getElementById('pdfBtn').addEventListener('click', generatePDF);
+
+            // Floating action button for mobile
+            fab.addEventListener('click', function () {
+                expenseForm.scrollIntoView({ behavior: 'smooth' });
+            });
+        }
+
+        function navigateToPrevMonth() {
+            currentFilterMonth.setMonth(currentFilterMonth.getMonth() - 1);
+            updateMonthDisplay();
+            renderTransactions();
+        }
+
+        function navigateToNextMonth() {
+            currentFilterMonth.setMonth(currentFilterMonth.getMonth() + 1);
+            updateMonthDisplay();
+            renderTransactions();
+        }
+
+        function updateMonthDisplay() {
+            const monthNames = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            const monthName = monthNames[currentFilterMonth.getMonth()];
+            const year = currentFilterMonth.getFullYear();
+
+            currentMonthDisplay.textContent = `${monthName} ${year}`;
+            reportPeriod.textContent = `Monthly Expenses (${monthName} ${year})`;
+        }
+
+        function saveUserInfo() {
+            userInfo = {
+                name: userNameInput.value,
+                phone: userPhoneInput.value
+            };
+            localStorage.setItem(USER_INFO_KEY, JSON.stringify(userInfo));
+            updateUserInfo();
+            userForm.style.display = 'none';
+            showToast('User information updated successfully!', 'success');
+        }
+
+        function addExpense(e) {
+            e.preventDefault();
+
+            const newExpense = {
+                id: Date.now(),
+                date: expenseForm.expenseDate.value,
+                amount: parseFloat(expenseForm.expenseAmount.value),
+                category: expenseForm.expenseCategory.value,
+                description: expenseForm.expenseDescription.value
+            };
+
+            expenses.push(newExpense);
+            localStorage.setItem(EXPENSES_KEY, JSON.stringify(expenses));
+
+            // Reset form but keep date
+            expenseForm.expenseAmount.value = '';
+            expenseForm.expenseDescription.value = '';
+            expenseForm.expenseDate.value = today.toISOString().slice(0, 10);
+
+            renderTransactions();
+
+            // Show success feedback
+            showToast('Expense added successfully!', 'success');
+        }
+
+        function deleteExpense(id) {
+            if (confirm('Are you sure you want to delete this expense?')) {
+                expenses = expenses.filter(expense => expense.id !== id);
+                localStorage.setItem(EXPENSES_KEY, JSON.stringify(expenses));
+                renderTransactions();
+                showToast('Expense deleted successfully!', 'warning');
+            }
+        }
+
+        function clearAllExpenses() {
+            if (confirm('Are you sure you want to delete ALL expenses? This cannot be undone.')) {
+                expenses = [];
+                localStorage.setItem(EXPENSES_KEY, JSON.stringify(expenses));
+                renderTransactions();
+                showToast('All expenses cleared!', 'danger');
+            }
+        }
+
+        function renderTransactions() {
+            // Filter expenses for the selected month
+            const selectedYear = currentFilterMonth.getFullYear();
+            const selectedMonth = currentFilterMonth.getMonth() + 1; // Months are 0-indexed in JS
+
+            const filteredExpenses = expenses.filter(expense => {
+                const expenseDate = new Date(expense.date);
+                return expenseDate.getFullYear() === selectedYear &&
+                    (expenseDate.getMonth() + 1) === selectedMonth;
+            });
+
+            // Sort by date (newest first)
+            filteredExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            let total = 0;
+
+            if (filteredExpenses.length === 0) {
+                transactionsBody.innerHTML = '';
+                emptyState.classList.remove('d-none');
+            } else {
+                emptyState.classList.add('d-none');
+                transactionsBody.innerHTML = filteredExpenses.map(expense => {
+                    total += expense.amount;
+
+                    // Format date for display
+                    const dateObj = new Date(expense.date);
+                    const formattedDate = dateObj.toLocaleDateString('en-GB', {
+                        day: '2-digit',
+                        month: 'short',
+                        year: 'numeric'
+                    });
+
+                    return `
+                        <tr>
+                            <td>${formattedDate}</td>
+                            <td>${expense.description}</td>
+                            <td>${expense.category}</td>
+                            <td class="amount expense">₹${expense.amount.toFixed(2)}</td>
+                            <td class="no-print">
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteExpense(${expense.id})">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+
+            // Update totals
+            tableTotal.textContent = `₹${total.toFixed(2)}`;
+            monthTotal.textContent = `₹${total.toFixed(2)}`;
+            transactionCount.textContent = filteredExpenses.length;
+        }
+
+        function generatePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            // Set initial y position
+            let yPos = 20;
+
+            // Add header
+            doc.setFontSize(16);
+            doc.setTextColor(26, 35, 126);
+            doc.text('Rozana Ka Hisab Report', 20, yPos);
+
+            yPos += 10;
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.text(`Name: ${userInfo.name}`, 20, yPos);
+            doc.text(`Phone: ${userInfo.phone}`, 110, yPos);
+
+            yPos += 10;
+            doc.setFontSize(14);
+            doc.text(reportPeriod.textContent, 20, yPos);
+
+            yPos += 15;
+
+            // Add table headers
+            doc.setFontSize(10);
+            doc.setFillColor(240, 242, 245);
+            doc.rect(20, yPos, 170, 10, 'F');
+            doc.setTextColor(26, 35, 126);
+            doc.text('Date', 22, yPos + 7);
+            doc.text('Description', 50, yPos + 7);
+            doc.text('Category', 120, yPos + 7);
+            doc.text('Amount (₹)', 180, yPos + 7, { align: 'right' });
+
+            yPos += 10;
+
+            // Get filtered expenses for the selected month
+            const selectedYear = currentFilterMonth.getFullYear();
+            const selectedMonth = currentFilterMonth.getMonth() + 1;
+
+            const filteredExpenses = expenses.filter(expense => {
+                const expenseDate = new Date(expense.date);
+                return expenseDate.getFullYear() === selectedYear &&
+                    (expenseDate.getMonth() + 1) === selectedMonth;
+            });
+
+            // Sort by date (newest first)
+            filteredExpenses.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            // Add transaction rows
+            doc.setTextColor(0, 0, 0);
+            let total = 0;
+
+            filteredExpenses.forEach(expense => {
+                // Check if we need a new page
+                if (yPos > 270) {
+                    doc.addPage();
+                    yPos = 20;
+                }
+
+                // Format date
+                const dateObj = new Date(expense.date);
+                const formattedDate = dateObj.toLocaleDateString('en-GB', {
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
+
+                doc.text(formattedDate, 22, yPos + 7);
+
+                // Truncate description if too long
+                let description = expense.description;
+                if (description.length > 30) {
+                    description = description.substring(0, 30) + '...';
+                }
+                doc.text(description, 50, yPos + 7);
+
+                doc.text(expense.category, 120, yPos + 7);
+                doc.text(`₹${expense.amount.toFixed(2)}`, 180, yPos + 7, { align: 'right' });
+
+                total += expense.amount;
+                yPos += 10;
+            });
+
+            // Add total row
+            yPos += 5;
+            doc.setDrawColor(200, 200, 200);
+            doc.line(20, yPos, 190, yPos);
+
+            yPos += 10;
+            doc.setFontSize(12);
+            doc.setFont(undefined, 'bold');
+            doc.text('Total Expenses:', 120, yPos + 7);
+            doc.text(`₹${total.toFixed(2)}`, 180, yPos + 7, { align: 'right' });
+
+            // Save the PDF
+            const monthNames = [
+                'January', 'February', 'March', 'April', 'May', 'June',
+                'July', 'August', 'September', 'October', 'November', 'December'
+            ];
+            const monthName = monthNames[currentFilterMonth.getMonth()];
+            const year = currentFilterMonth.getFullYear();
+
+            const fileName = `Rozana_Ka_Hisab_${monthName}_${year}.pdf`;
+            doc.save(fileName);
+            showToast('PDF downloaded successfully!', 'success');
+        }
+
+        // Toast notification function
+        function showToast(message, type) {
+            // Create toast element
+            const toast = document.createElement('div');
+            toast.className = `alert alert-${type} alert-dismissible fade show`;
+            toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                z-index: 1000;
+                min-width: 250px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            `;
+            toast.innerHTML = `
+                ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            `;
+
+            document.body.appendChild(toast);
+
+            // Auto remove after 3 seconds
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.parentNode.removeChild(toast);
+                }
+            }, 3000);
+        }
+    </script>
+</body>
+
+</html>

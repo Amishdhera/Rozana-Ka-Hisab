@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Loading - Rozana Ka Hisab</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        :root {
+            --primary: #1a237e;
+            --secondary: #283593;
+            --accent: #3949ab;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            overflow: hidden;
+        }
+
+        .loader-container {
+            text-align: center;
+            animation: fadeIn 1s ease-in;
+        }
+
+        .loader-logo {
+            width: 120px;
+            height: 120px;
+            background: white;
+            border-radius: 25px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            animation: pulse 2s infinite;
+        }
+
+        .loader-logo img {
+            width: 80%;
+            height: 80%;
+            object-fit: contain;
+            border-radius: 15px;
+        }
+
+        .loader-text {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .loader-subtext {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 40px;
+        }
+
+        .spinner {
+            width: 60px;
+            height: 60px;
+            border: 6px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 30px;
+        }
+
+        .progress-container {
+            width: 300px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 20px auto;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: white;
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+            animation: progress 5s linear forwards;
+        }
+
+        .countdown {
+            font-size: 1rem;
+            margin-top: 20px;
+            opacity: 0.8;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes progress {
+            0% {
+                width: 0%;
+            }
+
+            100% {
+                width: 100%;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .loader-logo {
+                width: 100px;
+                height: 100px;
+            }
+
+            .loader-text {
+                font-size: 1.8rem;
+            }
+
+            .loader-subtext {
+                font-size: 1rem;
+            }
+
+            .progress-container {
+                width: 250px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="loader-container">
+        <div class="loader-logo">
+            <img src="logo.png" alt="Rozana Ka Hisab Logo"
+                onerror="this.style.display='none'; this.parentNode.innerHTML='<i class=\'fas fa-calculator\' style=\'font-size:3rem; color:#1a237e;\'></i>';">
+        </div>
+
+        <h1 class="loader-text">Rozana Ka Hisab</h1>
+        <p class="loader-subtext">Daily Expense Tracker</p>
+
+        <div class="spinner"></div>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div class="countdown" id="countdown">
+            Loading... 5s
+        </div>
+    </div>
+
+    <script>
+        // Countdown timer
+        let seconds = 5;
+        const countdownElement = document.getElementById('countdown');
+        const progressBar = document.getElementById('progressBar');
+
+        const countdownInterval = setInterval(() => {
+            seconds--;
+            countdownElement.textContent = `Loading... ${seconds}s`;
+
+            if (seconds <= 0) {
+                clearInterval(countdownInterval);
+                // Redirect to main app
+                window.location.href = 'Rozana Ka Hisab .html';
+            }
+        }, 1000);
+
+        // Auto redirect after 5 seconds
+        setTimeout(() => {
+            window.location.href = 'Rozana Ka Hisab .html';
+        }, 5000);
+    </script>
+</body>
+
+</html>
